@@ -1,0 +1,29 @@
+.keyword-container {
+    position: relative;
+    display: inline-block;
+  }
+  
+  .keyword {
+    text-decoration: underline;
+    cursor: pointer;
+  }
+  
+  .keyword-tooltip {
+    position: absolute;
+    bottom: 100%;
+    left: 50%;
+    transform: translateX(-50%);
+    padding: 8px;
+    background-color: #fff;
+    border: 1px solid #ddd;
+    z-index: 10;
+    /* Style for your tooltip */
+    /* Hide the tooltip initially */
+    display: none;
+  }
+  
+  .keyword:hover .keyword-tooltip {
+    /* Show the tooltip on hover */
+    display: block;
+  }
+  
