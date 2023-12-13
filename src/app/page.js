@@ -91,6 +91,7 @@ const HighlightTextArea = ({ highlightData, onSnippetClick, text, setText }) => 
         onChange={(e) => setText(e.target.value)}
         onClick={handleClick}
         onScroll={handleScroll}
+        placeholder='write anything...'
         style={{ whiteSpace: 'pre-wrap', wordWrap: 'break-word', position: 'absolute', zIndex: 2, width: '100%', height: '100%', margin: 0, border: '0px', padding: '10px', fontSize: '16px', resize: 'none', color: 'black', caretColor: 'black', opacity: .5 }}
       />
     </div>
@@ -182,7 +183,7 @@ export default function Home() {
 
           <div className='relative h-screen w-full flex justify-center items-center place-items-center place-content-center'>
 
-            <div className='relative shadow-sm h-5/6 w-5/6 rounded-md bg-slate-200/20 pb-2'>
+            <div className='relative shadow-sm h-5/6 w-5/6 rounded-md bg-slate-200/70 pb-2'>
               <HighlightTextArea highlightData={highlightData} text={text} setText={setText} onSnippetClick={activeHighlight} />
             </div>
           </div>
