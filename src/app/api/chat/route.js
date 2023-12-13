@@ -1,29 +1,26 @@
 import Anthropic from "@anthropic-ai/sdk";
 import { NextResponse } from 'next/server'
 
+const { GoogleGenerativeAI } = require("@google/generative-ai");
+
 
 
 export async function POST(req, res) {
     let body = await req.json()
 
-    const anthropic = new Anthropic({
-        apiKey: process.env.ANTHROPIC_API_KEY
-    });
+    const genAI = new GoogleGenerativeAI(process.env.GEMINI);
+    const model = genAI.getGenerativeModel({ model: "gemini-pro"});
 
-    console.log(body.prompt)
+
+    console.log(body.prompt.text)
 
     async function main() {
-        const completion = await anthropic.completions.create({
-            model: "claude-2.1",
-            max_tokens_to_sample: 1000,
-            temperature: 0,
-            prompt: `${Anthropic.HUMAN_PROMPT} 
-
-        Here is the text to analyze:
+        const prompt = `Here is the text to analyze:
         ${body.prompt.text}
 
-        Review the text for errors, including grammar, capitalization, spelling, accuracy, flow, and anything you find you need to change. Respond in JSON format, appending each issue to a list 'issues'. Each issue should be a JSON object with 'snippet', 'reason', 'solution' (array with original and corrected text), and a color code ('red' for major, 'orange/yellow' for moderate, 'greenish' for positive, 'purple' for unrelated). Be critical but optimistic.
-        YOU MAY ONLY RESPOND IN THIS JSON FORMAT! DO NOT WRITE ANYTHING ELSE BUT THIS JSON! THIS MEANS NO TEXT BEFORE OR AFTER THE JSON!        
+        Review the text for errors, including grammar, capitalization, punctuation, spelling, accuracy, flow between paragraphs and ideas, FIND FACTUAL ACCURACY ERRORS, THE STRENGTH OF THEIR ARGUMENT, and anything you find you need to change. BE SUPER HARSH BUT POSITIVE, TRY TO FIND SOMETHING MEANINGFUL TO CHANGE. Respond in JSON format, appending each issue to a list 'issues'. Each issue should be a JSON object with 'snippet', 'reason', 'solution' (array with original and corrected text), and a color code ('red' for major, 'orange/yellow' for moderate, 'green' for positive, 'purple' for unrelated). Be critical but optimistic.
+        YOU MAY ONLY RESPOND IN THIS JSON FORMAT! DO NOT WRITE ANYTHING ELSE BUT THIS JSON! THIS MEANS NO TEXT BEFORE OR AFTER THE JSON! IF NO ERROR IS FOUND, DO NOT ADD IT TO THE JSON!!!        
+        YOU MUST FIND EXAMPLES FOR SNIPPETS UNLESS THE TEXT IS PERFECT! AND NO MARKDOWN!
         Example JSON response:
 
         {
@@ -41,15 +38,18 @@ export async function POST(req, res) {
         
         "report": {
             "analysis": "A brief analysis of what the writer did well and can work on.",
-            //all scores are out of 10. NO TEXT, JUST NUMBERS/10 written as a string (example: "5/10" or "10/10")
+            //all scores are out of 10. NO TEXT or N/A, JUST NUMBERS/10 written as a string (example: "5/10" or "10/10")
             "score": ["score on grammar, spelling, etc", "score on accuracy, flow, etc", "overall score"]
         }
         }
-        YOU MAY ONLY RESPOND IN THIS JSON FORMAT! DO NOT WRITE ANYTHING ELSE BUT THIS JSON! THIS MEANS NO TEXT BEFORE OR AFTER THE JSON!
-         ${Anthropic.AI_PROMPT}`,
-        });
-        console.log(completion);
-        return completion
+        YOU MAY ONLY RESPOND IN THIS JSON FORMAT! DO NOT WRITE ANYTHING ELSE BUT THIS JSON! THIS MEANS NO TEXT BEFORE OR AFTER THE JSON! DO NOT RETURN AS A JSON BLOCK, BUT INSTEAD AS VALID JSON!!!
+        `
+
+        const result = await model.generateContent(prompt);
+        const response = await result.response;
+        const text = response.text();
+        console.log(text);
+        return text
     }
 
     let a = await main()

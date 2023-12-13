@@ -101,7 +101,11 @@ const HighlightTextArea = ({ highlightData, onSnippetClick, text, setText }) => 
 
 export default function Home() {
 
-  const [scores, setScores] = useState(['0/10', '0/10', '0/10'])
+  const [scores, setScores] = useState(
+    {analysis: 'start writing to have an analysis...',
+    score: ['0/10', '0/10', '0/10']
+  }
+    )
   const [text, setText] = useState('')
 
   /*
@@ -137,9 +141,9 @@ export default function Home() {
     const data = await response.json();
     console.log(data)
 
-    sethighlightData(JSON.parse(data.completion).issues)
-    setScores(JSON.parse(data.completion).report.score)
-    console.log(JSON.parse(data.completion))
+    sethighlightData(JSON.parse(data).issues)
+    setScores(JSON.parse(data).report)
+    console.log(data)
   }
 
   const [activeHighlight, setActiveHighlight] = useState(null);
@@ -162,14 +166,16 @@ export default function Home() {
 
               <div className='w-fit m-2 font-light text-sm'>
                 <div className="flex">
-                  {scores.map((singleScore, index) => (
+                  {scores.score ? scores.score.map((singleScore, index) => (
                     <div className='p-2 rounded-md bg-slate-100 mr-2'>
                     <ProgressCircle value={parseFloat(singleScore) * 10} size="md">
                       <span className="text-xs text-gray-700 font-medium">{singleScore}</span>
                     </ProgressCircle>
                     <div className="font-light text-sm text-center">{scoreTitle[index]}</div>
                     </div>
-                  ))}
+                  )) : ''}
+                  <div className='font-light text-sm'>{scores.analysis}</div>
+                  
                 </div>
                 <div>Sentences: {analyzeText(text)[0]}</div>
                 <div className='ml-4 text-xs'>Avg sentence length: {analyzeText(text)[3]}</div>
@@ -198,6 +204,8 @@ export default function Home() {
                 <div className='font-light text-sm'>{reason.reason}</div>
 
                 <div className="flex font-light text-sm">
+                  {reason.solution[0] != "" && 
+                  <div>
                   <div className='p-1 bg-blue-500 rounded-md text-white'>{reason.solution[0]}</div>
                   <div>{"-->"}</div>
                   <div className="p-1 bg-blue-500 rounded-md text-white"
@@ -211,8 +219,13 @@ export default function Home() {
                       //TODO: INDEX DELETE
                     }}
                   >{reason.solution[1]}</div>
-
+                  </div>
+                }{reason.solution[0] == "" && 
+                <div className="p-1 bg-blue-500 rounded-md text-white">Good job! No problems here</div>
+                  }
                 </div>
+                
+                
               </div>
             ))}
           </div>
