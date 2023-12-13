@@ -2,9 +2,12 @@
 
 import Image from 'next/image'
 import React, { useState, useEffect, useRef } from 'react';
+import { ProgressCircle, Button } from "@tremor/react";
+import fetchChat from './api/chat/route.js'
 
-const HighlightTextArea = ({ highlightData, origin, onSnippetClick }) => {
-  const [text, setText] = useState(origin);
+
+
+const HighlightTextArea = ({ highlightData, onSnippetClick, text, setText }) => {
   const highlightsRef = useRef(null);
   const textAreaRef = useRef(null);
 
@@ -66,8 +69,47 @@ const HighlightTextArea = ({ highlightData, origin, onSnippetClick }) => {
 };
 
 
-const text = "The morning sun peeked through the curtains, casting a warm glow in the room. I usually enjoys a hearty breakfast, it energizes me for the day. Today's breakfast included scrambled eggs and a slice of whole grain toast, accompanied by a cup of freshly brewed coffee. The coffee was rich and aromatic, making the kitchen smell inviting. After breakfast, I decided to take a walk in the nearby park, it's always refreshing. The park was bustling with early risers, joggers, and people walking their dogs.\nAs I walked, I noticed the vibrant flowers, their colors bright against the green backdrop. The roses and tulips were in full bloom, creating a picturesque scene. I saw a small bird, possibly a sparrow, perching on a tree branch. The birds song was melodious, adding to the park's peaceful ambiance. In the distance, children played on the swings, their laughter echoing in the air.\nThe sky was a clear blue, with only a few wispy clouds scattered about. The weather forecast had predicted a sunny day, perfect for outdoor activities. I planned to meet my friend for lunch at our favorite cafe, located just outside the park. We often meet there to catch up and enjoy the cafe's delightful sandwiches and salads.\nOn my way to the cafe, I passed by a small bookstore, its windows displaying an array of books. I remembered that I needed to pick up a new novel, as I had finished my last one. The bookstore was cozy and welcoming, filled with the scent of paper and ink. I browsed through the shelves, eventually selecting a mystery novel that caught my eye.\nAfter purchasing the book, I continued to the cafe, where my friend was already waiting. We greeted each other and ordered our meals, enjoying the cafe's relaxed atmosphere. Our conversation ranged from recent events to plans for the upcoming weekend. We discussed possibly going to the beach, as the weather was expected to remain sunny.\nFollowing lunch, I returned home, feeling content and relaxed. The rest of the day was spent reading my new book and enjoying the tranquility of the afternoon. As the sun began to set, casting a golden light, I reflected on the day's simple pleasures. The evening was quiet, the perfect end to a peaceful day."
 export default function Home() {
+
+  const [scores, setScores] = useState(['0/10','0/10','0/10'])
+  const[text, setText] = useState('')
+
+  /*
+  useEffect(()=>{
+    async function getResponse(){
+    const response = await fetch(`/api/chat`, 
+    {method: "POST",
+    headers: {
+      "Content-Type": "application/json"
+    },
+    body: JSON.stringify({
+      prompt: {text}
+    })
+  });
+    const data = await response.json();
+    console.log(data)
+    }
+    getResponse()
+  }, [])*/
+
+
+  async function getResponse(){
+    const response = await fetch(`/api/chat`, 
+    {method: "POST",
+    headers: {
+      "Content-Type": "application/json"
+    },
+    body: JSON.stringify({
+      prompt: {text}
+    })
+  });
+    const data = await response.json();
+    console.log(data)
+    
+    sethighlightData(JSON.parse(data.completion).issues)
+    setScores(JSON.parse(data.completion).report.score)
+    console.log(JSON.parse(data.completion))
+    }
 
   const [activeHighlight, setActiveHighlight] = useState(null);
 
@@ -75,70 +117,37 @@ export default function Home() {
     setActiveHighlight(data);
   };
 
-  const highlightData = [
-    {
-      "snippet": "I usually enjoys a hearty breakfast, it energizes me for the day.",
-      "color": "red",
-      "reason": "Subject-verb agreement error; change 'enjoys' to 'enjoy'"
-    },
-    {
-      "snippet": "it's always refreshing.",
-      "color": "red",
-      "reason": "Incorrect conjunction; replace 'it's' with 'which is' for clarity"
-    },
-    {
-      "snippet": "The birds song was melodious,",
-      "color": "green",
-      "reason": "Possessive error; change 'birds' to 'bird's'"
-    },
-    {
-      "snippet": "The sky was a clear blue, with only a few wispy clouds scattered about.",
-      "color": "blue",
-      "reason": "Ambiguity; consider 'The sky was clear blue' for conciseness"
-    },
-    {
-      "snippet": "I planned to meet my friend for lunch at our favorite cafe, located just outside the park.",
-      "color": "orange",
-      "reason": "Redundant information; 'located just outside the park' could be omitted"
-    },
-    {
-      "snippet": "We often meet there to catch up and enjoy the cafe's delightful sandwiches and salads.",
-      "color": "blue",
-      "reason": "Redundancy; 'delightful' can be omitted for more concise description"
-    },
-    {
-      "snippet": "I passed by a small bookstore, its windows displaying an array of books.",
-      "color": "orange",
-      "reason": "Redundant description; consider removing 'displaying an array of books'"
-    },
-    {
-      "snippet": "I remembered that I needed to pick up a new novel, as I had finished my last one.",
-      "color": "blue",
-      "reason": "Verbose; consider shortening to 'I needed a new novel, having finished my last one'"
-    },
-    {
-      "snippet": "The bookstore was cozy and welcoming, filled with the scent of paper and ink.",
-      "color": "green",
-      "reason": "Descriptive clarity; consider 'The bookstore's cozy and welcoming atmosphere was filled with the scent of paper and ink'"
-    },
-    {
-      "snippet": "The rest of the day was spent reading my new book and enjoying the tranquility of the afternoon.",
-      "color": "orange",
-      "reason": "Passive voice; consider 'I spent the rest of the day reading my new book and enjoying the afternoon's tranquility'"
-    },
-    {
-      "snippet": "score",
-      "reason": "8/10. Try working on passive voice."
-    }
-  ]  
+  const [highlightData,sethighlightData] = useState([])  
 
 
   return (
     <div className='outline-1'>
       <div className='flex w-screen'>
+        <div className="w-full">
+          <div className='w-full flex place-content-center items-center'>
+            <div className="w-5/6 h-5/6 bg-slate-200/20 shadow-sm rounded-md p-2">
+           
+           <div className='w-fit m-2'>
+            <div className="flex">
+            {scores.map((singleScore)=>(
+           <ProgressCircle value={parseFloat(singleScore)*10} size="md">
+            <span className="text-xs text-gray-700 font-medium">{singleScore}</span>
+          </ProgressCircle>
+            ))}
+            </div>
+          <div>Sentences: {text.split('. ').length}</div>
+          <div>Words: {text.split(' ').length - 1}</div>
+          <div>Characters: {text.split('').length}</div>
+          </div>
+          <Button onClick={()=>getResponse()}>Search</Button>
+          </div>
+          </div>
+         
       <div className='relative h-screen w-full flex justify-center items-center place-items-center place-content-center'>
+      
         <div className='relative shadow-sm h-5/6 w-5/6 rounded-md bg-slate-200/20 pb-2'>
-      <HighlightTextArea highlightData={highlightData} origin={text} onSnippetClick={activeHighlight} />
+      <HighlightTextArea highlightData={highlightData} text={text} setText={setText} onSnippetClick={activeHighlight} />
+      </div>
       </div>
       </div>
       <div className='relative h-screen w-full max-w-md flex justify-center items-center place-items-center place-content-center'>
@@ -149,6 +158,22 @@ export default function Home() {
           >
             <div className='italic'>{reason.snippet}</div>
             <div className='font-light text-sm'>{reason.reason}</div>
+            
+            <div className="flex font-light text-sm">
+            <div className='p-1 bg-blue-500 rounded-md text-white'>{reason.solution[0]}</div>
+            <div>{"-->"}</div>
+            <div className="p-1 bg-blue-500 rounded-md text-white"
+            onClick={()=>{
+              const newText = text.replace(reason.solution[0], reason.solution[1]);
+              setText(newText);
+              //TODO: INDEX DELETE
+            }}
+            >{reason.solution[1]}</div>
+
+           
+
+
+            </div>
             </div>
         ))}
         </div>
