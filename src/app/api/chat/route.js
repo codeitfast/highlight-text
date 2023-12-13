@@ -18,7 +18,9 @@ export async function POST(req, res) {
         const prompt = `Here is the text to analyze:
         ${body.prompt.text}
 
-        Review the text for errors, including grammar, capitalization, punctuation, spelling, accuracy, flow between paragraphs and ideas, FIND FACTUAL ACCURACY ERRORS, THE STRENGTH OF THEIR ARGUMENT, and anything you find you need to change. BE SUPER HARSH BUT POSITIVE, TRY TO FIND SOMETHING MEANINGFUL TO CHANGE. Respond in JSON format, appending each issue to a list 'issues'. Each issue should be a JSON object with 'snippet', 'reason', 'solution' (array with original and corrected text), and a color code ('red' for major, 'orange/yellow' for moderate, 'green' for positive, 'purple' for unrelated). Be critical but optimistic.
+        Review the text for errors, including grammar, capitalization, punctuation, spelling, accuracy, flow between paragraphs and ideas, FIND FACTUAL ACCURACY ERRORS, THE STRENGTH OF THEIR ARGUMENT, and anything you find you need to change. 
+        I want you to find errors in their ideas, thought process, and order of paragraphs (if applicable). If they say "one more sentence" or a filler, try to give them a possible thing to put there.
+        BE SUPER HARSH AND HONEST BUT ALSO POSITIVE, TRY TO FIND SOMETHING MEANINGFUL TO CHANGE. Respond in JSON format, appending each issue to a list 'issues'. Each issue should be a JSON object with 'snippet', 'reason', 'solution' (array with original and corrected text), and a color code ('red' for major, 'orange/yellow' for moderate, 'green' for positive, 'purple' for unrelated). Be critical but optimistic.
         YOU MAY ONLY RESPOND IN THIS JSON FORMAT! DO NOT WRITE ANYTHING ELSE BUT THIS JSON! THIS MEANS NO TEXT BEFORE OR AFTER THE JSON! IF NO ERROR IS FOUND, DO NOT ADD IT TO THE JSON!!!        
         YOU MUST FIND EXAMPLES FOR SNIPPETS UNLESS THE TEXT IS PERFECT! AND NO MARKDOWN!
         Example JSON response:
