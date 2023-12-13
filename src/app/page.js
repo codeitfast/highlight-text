@@ -5,7 +5,36 @@ import React, { useState, useEffect, useRef } from 'react';
 import { ProgressCircle, Button } from "@tremor/react";
 import fetchChat from './api/chat/route.js'
 
+function analyzeText(text) {
+  // Replace carriage returns and newlines with spaces for uniformity
+  text = text.replace(/[\r\n]/g, ' ');
 
+  // Sentence count
+  const sentences = text.match(/[^.!?]+[.!?]+/g) || [];
+  const sentenceCount = sentences.length;
+
+  // Word count
+  const words = text.match(/\b(\w+)\b/g) || [];
+  const wordCount = words.length;
+
+  // Character count (excluding spaces)
+  const characterCount = text.replace(/\s/g, '').length;
+
+  // Average number of words per sentence
+  const averageWordsPerSentence = sentenceCount > 0 ? wordCount / sentenceCount : 0;
+
+  // Average length of words
+  const totalWordLength = words.reduce((acc, word) => acc + word.length, 0);
+  const averageWordLength = wordCount > 0 ? totalWordLength / wordCount : 0;
+
+  return [
+      sentenceCount,
+      wordCount,
+      characterCount,
+      averageWordsPerSentence,
+      averageWordLength
+  ]
+}
 
 const HighlightTextArea = ({ highlightData, onSnippetClick, text, setText }) => {
   const highlightsRef = useRef(null);
@@ -120,6 +149,8 @@ export default function Home() {
 
   const [highlightData, sethighlightData] = useState([])
 
+  const scoreTitle = ['mechanics','flow','overall']
+
 
   return (
     <div className='outline-1'>
@@ -128,19 +159,24 @@ export default function Home() {
           <div className='w-full flex place-content-center items-center'>
             <div className="w-5/6 h-5/6 bg-slate-200/20 shadow-sm rounded-md p-2">
 
-              <div className='w-fit m-2'>
+              <div className='w-fit m-2 font-light text-sm'>
                 <div className="flex">
-                  {scores.map((singleScore) => (
+                  {scores.map((singleScore, index) => (
+                    <div className='p-2 rounded-md bg-slate-100 mr-2'>
                     <ProgressCircle value={parseFloat(singleScore) * 10} size="md">
                       <span className="text-xs text-gray-700 font-medium">{singleScore}</span>
                     </ProgressCircle>
+                    <div className="font-light text-sm text-center">{scoreTitle[index]}</div>
+                    </div>
                   ))}
                 </div>
-                <div>Sentences: {text.split('. ').length}</div>
-                <div>Words: {text.split(' ').length - 1}</div>
-                <div>Characters: {text.split('').length}</div>
+                <div>Sentences: {analyzeText(text)[0]}</div>
+                <div className='ml-4 text-xs'>Avg sentence length: {analyzeText(text)[3]}</div>
+                <div>Words: {analyzeText(text)[1]}</div>
+                {/*<div className='mr-4'>Avg word length: {Math.round(analyzeText(text))[4]}</div>*/}
+                <div>Characters: {analyzeText(text)[2]}</div>
               </div>
-              <Button onClick={() => getResponse()}>Search</Button>
+              <Button onClick={() => getResponse()}>Search {"(will be ratelimited soon)"}</Button>
             </div>
           </div>
 
