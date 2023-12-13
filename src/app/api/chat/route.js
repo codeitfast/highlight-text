@@ -1,23 +1,23 @@
 import Anthropic from "@anthropic-ai/sdk";
 import { NextResponse } from 'next/server'
 
-  
 
-export async function POST(req, res){
+
+export async function POST(req, res) {
     let body = await req.json()
 
     const anthropic = new Anthropic({
-    apiKey: process.env.ANTHROPIC_API_KEY
+        apiKey: process.env.ANTHROPIC_API_KEY
     });
 
     console.log(body.prompt)
-    
+
     async function main() {
-    const completion = await anthropic.completions.create({
-        model: "claude-2.1",
-        max_tokens_to_sample: 1000,
-        temperature: 0,
-        prompt: `${Anthropic.HUMAN_PROMPT} 
+        const completion = await anthropic.completions.create({
+            model: "claude-2.1",
+            max_tokens_to_sample: 1000,
+            temperature: 0,
+            prompt: `${Anthropic.HUMAN_PROMPT} 
 
         Here is the text to analyze:
         ${body.prompt.text}
@@ -47,11 +47,11 @@ export async function POST(req, res){
         }
         YOU MAY ONLY RESPOND IN THIS JSON FORMAT! DO NOT WRITE ANYTHING ELSE BUT THIS JSON! THIS MEANS NO TEXT BEFORE OR AFTER THE JSON!
          ${Anthropic.AI_PROMPT}`,
-    });
-    console.log(completion);
-    return completion
+        });
+        console.log(completion);
+        return completion
     }
 
-    let a=await main()
+    let a = await main()
     return NextResponse.json(a)
 }
