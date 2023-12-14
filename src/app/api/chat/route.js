@@ -74,6 +74,7 @@ export async function POST(req, res) {
             "snippet": "Example error in the text",
             "reason": "Explanation of why it's an error",
             //solutions should do the minimal amount of change to fix it. So, no new ideas, just fix the error
+            //If the problem does not have a simple solution (like adding a word, or the solution is to change an idea, keep solution empty)
             "solution": ["Incorrect version", "Corrected version"],
             "color": "red"
             },

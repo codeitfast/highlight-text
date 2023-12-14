@@ -5,7 +5,9 @@ import React, { useState, useEffect, useRef } from 'react';
 import { ProgressCircle, Button } from "@tremor/react";
 import fetchChat from './api/chat/route.js'
 import { Select, SelectItem } from "@tremor/react";
-import {AnimatePresence,motion} from 'framer-motion'
+import { AnimatePresence, motion } from 'framer-motion'
+import {SparklesIcon, FireIcon, ClipboardDocumentListIcon} from '@heroicons/react/24/solid'
+//if you get gpt4 use fire?
 
 function analyzeText(text) {
   // Replace carriage returns and newlines with spaces for uniformity
@@ -30,11 +32,11 @@ function analyzeText(text) {
   const averageWordLength = wordCount > 0 ? totalWordLength / wordCount : 0;
 
   return [
-      sentenceCount,
-      wordCount,
-      characterCount,
-      averageWordsPerSentence,
-      averageWordLength
+    sentenceCount,
+    wordCount,
+    characterCount,
+    averageWordsPerSentence,
+    averageWordLength
   ]
 }
 
@@ -109,27 +111,10 @@ export default function Home() {
   })
   const [text, setText] = useState('')
   const [engine, setEngine] = useState(1)
-
-  /*
-  useEffect(()=>{
-    async function getResponse(){
-    const response = await fetch(`/api/chat`, 
-    {method: "POST",
-    headers: {
-      "Content-Type": "application/json"
-    },
-    body: JSON.stringify({
-      prompt: {text}
-    })
-  });
-    const data = await response.json();
-    console.log(data)
-    }
-    getResponse()
-  }, [])*/
-
+  const [searching, setSearching] = useState(false)
 
   async function getResponse() {
+    setSearching(true)
     const response = await fetch(`/api/chat`,
       {
         method: "POST",
@@ -138,7 +123,7 @@ export default function Home() {
         },
         body: JSON.stringify({
           prompt: { text },
-          engine: ['claude', 'gemini'][engine-1]
+          engine: ['claude', 'gemini'][engine - 1]
         })
       });
     const data = await response.json();
@@ -147,6 +132,7 @@ export default function Home() {
     sethighlightData(JSON.parse(data.completion).issues)
     setScores(JSON.parse(data.completion).report)
     console.log(JSON.parse(data.completion))
+    setSearching(false)
   }
 
   const [activeHighlight, setActiveHighlight] = useState(null);
@@ -157,7 +143,7 @@ export default function Home() {
 
   const [highlightData, sethighlightData] = useState([])
 
-  const scoreTitle = ['mechanics','flow','overall']
+  const scoreTitle = ['mechanics', 'flow', 'overall']
 
 
   return (
@@ -171,10 +157,10 @@ export default function Home() {
                 <div className="flex">
                   {scores.score.map((singleScore, index) => (
                     <div className='p-2 rounded-md bg-slate-100 mr-2'>
-                    <ProgressCircle value={parseFloat(singleScore) * 10} size="md">
-                      <span className="text-xs text-gray-700 font-medium">{singleScore}</span>
-                    </ProgressCircle>
-                    <div className="font-light text-sm text-center">{scoreTitle[index]}</div>
+                      <ProgressCircle value={parseFloat(singleScore) * 10} size="md">
+                        <span className="text-xs text-gray-700 font-medium">{singleScore}</span>
+                      </ProgressCircle>
+                      <div className="font-light text-sm text-center">{scoreTitle[index]}</div>
                     </div>
                   ))}
                   <div>{scores.analysis}</div>
@@ -186,17 +172,26 @@ export default function Home() {
                 <div>Characters: {analyzeText(text)[2]}</div>
               </div>
               <div className='flex justify-between'>
-              <Button onClick={() => getResponse()}>Search {"(will be ratelimited soon)"}</Button>
-              <div className="max-w-sm space-y-6">
-              <Select value={engine} onValueChange={setEngine}>
-                <SelectItem value="1">
-                Claude
-                </SelectItem>
-                <SelectItem value="2">
-                Gemini
-                </SelectItem>
-              </Select>
-            </div>
+                <Button onClick={() =>{if(searching == false){getResponse()}}} className={`flex disabled:bg-blue-300 disabled:outline-none`} disabled={searching==true || text.length == 0}>
+                  <motion.div className="w-fit">
+                  {searching == true && 
+                  <svg className="animate-spin h-5 w-5 text-white flex" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                    <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                    <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                  </svg>}
+                  {searching == false && "Search (will be ratelimited soon)"}
+                  </motion.div>
+                  </Button>
+                <div className="max-w-sm space-y-6">
+                  <Select value={engine} onValueChange={setEngine}>
+                    <SelectItem value="1" icon={ClipboardDocumentListIcon}>
+                      Claude
+                    </SelectItem>
+                    <SelectItem value="2" icon={SparklesIcon}>
+                    Gemini (new!)
+                    </SelectItem>
+                  </Select>
+                </div>
               </div>
             </div>
           </div>
@@ -212,32 +207,32 @@ export default function Home() {
           <div className="h-5/6 w-5/6 overflow-y-scroll">
             <AnimatePresence>
               <motion.div layout>
-            {highlightData.map((reason, index) => (
-              <motion.div initial={{scale:.9, opacity: 0}} animate={{scale:1, opacity: 1}} exit={{ opacity: 0, x:300 }} className={`transition-all rounded-md bg-slate-200/20 p-2 m-2 cursor-pointer shadow-sm ${activeHighlight === index ? 'bg-blue-300 font-bold scale-95' : 'bg-slate-200/20'}`}
-                onClick={() => { setActiveHighlight(index) }}
-              >
-                <motion.div className='italic'>{reason.snippet}</motion.div>
-                <motion.div className='font-light text-sm'>{reason.reason}</motion.div>
+                {highlightData.map((reason, index) => (
+                  <motion.div initial={{ scale: .9, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} exit={{ opacity: 0, x: 300 }} className={`transition-all rounded-md bg-slate-200/20 p-2 m-2 cursor-pointer shadow-sm ${activeHighlight === index ? 'bg-blue-300 font-bold scale-95' : 'bg-slate-200/20'}`}
+                    onClick={() => { setActiveHighlight(index) }}
+                  >
+                    <motion.div className='italic'>{reason.snippet}</motion.div>
+                    <motion.div className='font-light text-sm'>{reason.reason}</motion.div>
 
-                <motion.div className="flex font-light text-sm">
-                  <motion.div className='p-1 bg-blue-500 rounded-md text-white'>{reason.solution[0]}</motion.div>
-                  <motion.div>{"-->"}</motion.div>
-                  <motion.div className="p-1 bg-blue-500 rounded-md text-white"
-                    onClick={() => {
-                      const newText = text.replace(reason.solution[0], reason.solution[1]);
-                      setText(newText);
+                    <motion.div className="flex font-light text-sm">
+                      <motion.div className='p-1 bg-blue-500 rounded-md text-white'>{reason.solution[0]}</motion.div>
+                      <motion.div>{"-->"}</motion.div>
+                      <motion.div className="p-1 bg-blue-500 rounded-md text-white"
+                        onClick={() => {
+                          const newText = text.replace(reason.solution[0], reason.solution[1]);
+                          setText(newText);
 
-                      let updateIndex = [...highlightData]
-                      updateIndex.splice(index,1)
-                      sethighlightData(updateIndex)
-                      //TODO: INDEX DELETE
-                    }}
-                  >{reason.solution[1]}</motion.div>
+                          let updateIndex = [...highlightData]
+                          updateIndex.splice(index, 1)
+                          sethighlightData(updateIndex)
+                          //TODO: INDEX DELETE
+                        }}
+                      >{reason.solution[1]}</motion.div>
 
-                </motion.div>
+                    </motion.div>
+                  </motion.div>
+                ))}
               </motion.div>
-            ))}
-            </motion.div>
             </AnimatePresence>
           </div>
         </div>
