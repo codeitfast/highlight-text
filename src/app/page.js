@@ -22,7 +22,7 @@ function analyzeText(text) {
   const wordCount = words.length;
 
   // Character count (excluding spaces)
-  const characterCount = text.replace(/\s/g, '').length;
+  const characterCount = text./*replace(/\s/g, '').*/length;
 
   // Average number of words per sentence
   const averageWordsPerSentence = sentenceCount > 0 ? wordCount / sentenceCount : 0;
@@ -49,7 +49,8 @@ const HighlightTextArea = ({ highlightData, onSnippetClick, text, setText }) => 
     return splitText.map((part, index) => {
       const highlight = highlightData.find(data => new RegExp(data.snippet, 'gi').test(part));
       return highlight ? (
-        <mark key={index} style={{ background: (index - 1) / 2 == onSnippetClick ? highlight.color : 'none', textDecorationColor: highlight.color + " !important", textDecoration: 'underline' }}>
+        
+        <mark key={(index-1)/2} style={{ background: (index - 1)/2 == onSnippetClick ? highlight.color : 'none', textDecorationColor: highlight.color + " !important", textDecoration: 'underline' }}>
           {part}
         </mark>
       ) : (
@@ -85,7 +86,7 @@ const HighlightTextArea = ({ highlightData, onSnippetClick, text, setText }) => 
       <div
         ref={highlightsRef}
         className="highlights"
-        style={{ whiteSpace: 'pre-wrap', wordWrap: 'break-word', overflow: 'hidden', position: 'absolute', zIndex: 1, padding: '10px', width: '100%', height: '100%' }}
+        style={{ whiteSpace: 'pre-wrap', wordWrap: 'break-word', overflow: 'hidden', position: 'absolute', zIndex: 1, padding: '10px', width: '100%', height: '100%',boxSizing: 'content-box' }}
       >
         {getHighlightedText()}
       </div>
@@ -96,7 +97,7 @@ const HighlightTextArea = ({ highlightData, onSnippetClick, text, setText }) => 
         onClick={handleClick}
         onScroll={handleScroll}
         placeholder='write anything...'
-        style={{ whiteSpace: 'pre-wrap', wordWrap: 'break-word', position: 'absolute', zIndex: 2, width: '100%', height: '100%', margin: 0, border: '0px', padding: '10px', fontSize: '16px', resize: 'none', color: 'black', caretColor: 'black', opacity: .5 }}
+        style={{ whiteSpace: 'pre-wrap', wordWrap: 'break-word', position: 'absolute', zIndex: 2, width: '100%', height: '100%', margin: 0, border: '0px', padding: '10px', fontSize: '16px', resize: 'none', color: 'black', caretColor: 'black', opacity: .5, boxSizing: 'content-box' }}
       />
     </div>
   );
@@ -205,8 +206,8 @@ export default function Home() {
         </div>
         <div className='relative h-screen w-full max-w-md flex justify-center items-center place-items-center place-content-center'>
           <div className="h-5/6 w-5/6 overflow-y-scroll">
-            <AnimatePresence>
-              <motion.div layout>
+            <AnimatePresence initial={false}>
+              
                 {highlightData.map((reason, index) => (
                   <motion.div initial={{ scale: .9, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} exit={{ opacity: 0, x: 300 }} className={`transition-all rounded-md bg-slate-200/20 p-2 m-2 cursor-pointer shadow-sm ${activeHighlight === index ? 'bg-blue-300 font-bold scale-95' : 'bg-slate-200/20'}`}
                     onClick={() => { setActiveHighlight(index) }}
@@ -214,8 +215,10 @@ export default function Home() {
                     <motion.div className='italic'>{reason.snippet}</motion.div>
                     <motion.div className='font-light text-sm'>{reason.reason}</motion.div>
 
-                    <motion.div className="flex font-light text-sm">
-                      <motion.div className='p-1 bg-blue-500 rounded-md text-white'>{reason.solution[0]}</motion.div>
+                    <motion.div className="flex flex-wrap font-light text-sm w-full">
+                      {reason.solution[0] != undefined && reason.solution[1] != undefined &&
+                      <motion.div>
+                        <motion.div className='p-1 bg-blue-500 rounded-md text-white'>{reason.solution[0]}</motion.div>
                       <motion.div>{"-->"}</motion.div>
                       <motion.div className="p-1 bg-blue-500 rounded-md text-white"
                         onClick={() => {
@@ -228,11 +231,12 @@ export default function Home() {
                           //TODO: INDEX DELETE
                         }}
                       >{reason.solution[1]}</motion.div>
-
+                      </motion.div>
+                      }
                     </motion.div>
+                      
                   </motion.div>
                 ))}
-              </motion.div>
             </AnimatePresence>
           </div>
         </div>
