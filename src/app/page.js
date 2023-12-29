@@ -86,7 +86,7 @@ const HighlightTextArea = ({ highlightData, onSnippetClick, text, setText }) => 
       <div
         ref={highlightsRef}
         className="highlights"
-        style={{ whiteSpace: 'pre-wrap', wordWrap: 'break-word', overflow: 'hidden', position: 'absolute', zIndex: 1, padding: '10px', width: '100%', height: '100%',boxSizing: 'content-box' }}
+        style={{ whiteSpace: 'pre-wrap', wordWrap: 'break-word', overflow: 'hidden', position: 'absolute', zIndex: 1, padding: '10px', width: '100%', height: '100%' }}
       >
         {getHighlightedText()}
       </div>
@@ -97,7 +97,7 @@ const HighlightTextArea = ({ highlightData, onSnippetClick, text, setText }) => 
         onClick={handleClick}
         onScroll={handleScroll}
         placeholder='write anything...'
-        style={{ whiteSpace: 'pre-wrap', wordWrap: 'break-word', position: 'absolute', zIndex: 2, width: '100%', height: '100%', margin: 0, border: '0px', padding: '10px', fontSize: '16px', resize: 'none', color: 'black', caretColor: 'black', opacity: .5, boxSizing: 'content-box' }}
+        style={{ whiteSpace: 'pre-wrap', wordWrap: 'break-word', position: 'absolute', zIndex: 2, width: '100%', height: '100%', margin: 0, border: '0px', padding: '10px', fontSize: '16px', resize: 'none', color: 'black', caretColor: 'black', opacity: .5}}
       />
     </div>
   );
@@ -150,9 +150,18 @@ export default function Home() {
   return (
     <div className='outline-1'>
       <div className='flex w-screen'>
-        <div className="w-full">
-          <div className='w-full flex place-content-center items-center'>
-            <div className="w-5/6 h-5/6 bg-slate-200/20 shadow-sm rounded-md p-2">
+        <div className="w-full p-4 pr-2 h-screen">
+
+          <div className='relative h-full w-full flex justify-center items-center place-items-center place-content-center'>
+
+            <div className='relative shadow-sm rounded-md bg-slate-200/70 h-full w-full'>
+              <HighlightTextArea highlightData={highlightData} text={text} setText={setText} onSnippetClick={activeHighlight} />
+            </div>
+          </div>
+        </div>
+        <div className='relative h-full w-full max-w-md justify-center place-items-center place-content-center p-4 pl-2'>
+        <div className=''>
+            <div className="bg-slate-200/20 shadow-sm rounded-md p-2">
 
               <div className='w-fit m-2 font-light text-sm'>
                 <div className="flex">
@@ -180,7 +189,7 @@ export default function Home() {
                     <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
                     <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
                   </svg>}
-                  {searching == false && "Search (will be ratelimited soon)"}
+                  {searching == false && "Search"}
                   </motion.div>
                   </Button>
                 <div className="max-w-sm space-y-6">
@@ -196,16 +205,7 @@ export default function Home() {
               </div>
             </div>
           </div>
-
-          <div className='relative h-screen w-full flex justify-center items-center place-items-center place-content-center'>
-
-            <div className='relative shadow-sm h-5/6 w-5/6 rounded-md bg-slate-200/70 pb-2'>
-              <HighlightTextArea highlightData={highlightData} text={text} setText={setText} onSnippetClick={activeHighlight} />
-            </div>
-          </div>
-        </div>
-        <div className='relative h-screen w-full max-w-md flex justify-center items-center place-items-center place-content-center'>
-          <div className="h-5/6 w-5/6 overflow-y-scroll">
+          <div className="h-full w-full overflow-y-scroll">
             <AnimatePresence initial={false}>
               
                 {highlightData.map((reason, index) => (
