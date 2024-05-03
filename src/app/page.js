@@ -111,7 +111,8 @@ export default function Home() {
     score: ['0/10', '0/10', '0/10']
   })
   const [text, setText] = useState('')
-  const [engine, setEngine] = useState(1)
+  //engine 2 = gemini
+  const [engine, setEngine] = useState(2)
   const [searching, setSearching] = useState(false)
 
   async function getResponse() {
@@ -192,7 +193,7 @@ export default function Home() {
                   {searching == false && "Search"}
                   </motion.div>
                   </Button>
-                <div className="max-w-sm space-y-6">
+                {/*<div className="max-w-sm space-y-6">
                   <Select value={engine} onValueChange={setEngine}>
                     <SelectItem value="1" icon={ClipboardDocumentListIcon}>
                       Claude
@@ -201,7 +202,7 @@ export default function Home() {
                     Gemini (new!)
                     </SelectItem>
                   </Select>
-                </div>
+                  </div>*/}
               </div>
             </div>
           </div>
